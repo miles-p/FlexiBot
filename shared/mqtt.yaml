@@ -1,0 +1,16 @@
+# controls, which each have a topic, and friendly name
+controls:
+  motor1:
+    - topic: motor1/armed
+      name: Motor 1 Armed
+    - topic: motor1/speed
+      name: Motor 1 Speed
+  motor2:
+    - topic: motor2/armed
+      name: Motor 2 Armed
+    - topic: motor2/speed
+      name: Motor 2 Speed
+
+host:
+  address: mosquitto
+  port: 1883
