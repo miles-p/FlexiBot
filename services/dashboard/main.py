@@ -3,6 +3,8 @@ import os
 from nicegui import ui
 import paho.mqtt.client as mqtt
 from threading import Thread
+from datetime import datetime
+from collections import deque
 
 def load_config(file_name):
     # It is best practice to use absolute paths inside containers
@@ -22,6 +24,9 @@ config = load_config("mqtt.yaml")
 # Store topic data: {topic: {"name": friendly_name, "group": group_name, "message": last_message}}
 topic_data = {}
 ui_labels = {}
+speed_charts = {}  # Store chart references for speed topics
+speed_history = {}  # Store historical speed data: {topic: deque of (datetime, value)}
+MAX_HISTORY_SECONDS = 30  # Show 30 seconds of data
 
 # Initialize topic_data from config (now with groups)
 if config and 'controls' in config:
@@ -53,6 +58,31 @@ def on_message(client, userdata, msg):
         # Update UI label if it exists
         if topic in ui_labels:
             ui_labels[topic].set_text(message)
+        
+        # Update speed chart if this is a speed topic
+        if 'speed' in topic.lower() and topic in speed_charts:
+            try:
+                value = float(message)
+                now = datetime.now()
+                
+                # Add to history
+                if topic not in speed_history:
+                    speed_history[topic] = []
+                speed_history[topic].append((now, value))
+                
+                # Remove data older than 30 seconds
+                cutoff = now.timestamp() - MAX_HISTORY_SECONDS
+                speed_history[topic] = [(t, v) for t, v in speed_history[topic] if t.timestamp() > cutoff]
+                
+                # Update chart
+                chart = speed_charts[topic]
+                times = [t.strftime('%H:%M:%S') for t, v in speed_history[topic]]
+                values = [v for t, v in speed_history[topic]]
+                chart.options['xAxis']['data'] = times
+                chart.options['series'][0]['data'] = values
+                chart.update()
+            except ValueError:
+                pass  # Ignore non-numeric speed values
 
 # Setup MQTT client
 mqtt_client = mqtt.Client()
@@ -98,5 +128,31 @@ with ui.column().classes('w-full max-w-3xl mx-auto p-4'):
                             ui_labels[topic] = ui.label(topic_data[topic]['message']).classes(
                                 'text-lg font-mono bg-white px-3 py-1 rounded border'
                             )
+                        
+                        # Add live chart for speed topics
+                        if 'speed' in topic.lower():
+                            speed_charts[topic] = ui.echart({
+                                'xAxis': {
+                                    'type': 'category',
+                                    'data': [],
+                                    'axisLabel': {'rotate': 45, 'fontSize': 10}
+                                },
+                                'yAxis': {
+                                    'type': 'value',
+                                    'name': 'Speed',
+                                    'min': 0
+                                },
+                                'series': [{
+                                    'name': item['name'],
+                                    'type': 'line',
+                                    'data': [],
+                                    'smooth': True,
+                                    'lineStyle': {'color': '#3b82f6'},
+                                    'itemStyle': {'color': '#3b82f6'},
+                                    'areaStyle': {'color': 'rgba(59, 130, 246, 0.2)'}
+                                }],
+                                'grid': {'left': 50, 'right': 20, 'top': 20, 'bottom': 60},
+                                'animation': False
+                            }).classes('w-full h-48 mt-2')
 
 ui.run(host='0.0.0.0', port=8080, title='MQTT Dashboard')

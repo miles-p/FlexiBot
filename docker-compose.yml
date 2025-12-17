@@ -13,7 +13,21 @@ services:
     build: ./services/dashboard
     container_name: dashboard
     ports:
-      - "8080:8080"
+      - "0.0.0.0:8080:8080"
+    volumes:
+      - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
+    environment:
+      - MQTT_BROKER=mosquitto
+      - MQTT_PORT=1883
+    depends_on:
+      - mosquitto
+    restart: unless-stopped
+
+  controller:
+    build: ./services/controller
+    container_name: controller
+    ports:
+      - "0.0.0.0:8081:8081"
     volumes:
       - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
     environment:
