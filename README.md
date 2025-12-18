@@ -16,7 +16,7 @@ FlexiBot provides a modular, microservices-based architecture for controlling an
 
 ```
 ┌─────────────────┐     MQTT      ┌─────────────────┐
-│   Controller    │──────────────▶│    Mosquitto    │
+│   Controller    │─────────────> |   Mosquitto     |
 │   (Port 8081)   │   publish     │   MQTT Broker   │
 └─────────────────┘               └────────┬────────┘
                                            │ subscribe
@@ -29,12 +29,12 @@ FlexiBot provides a modular, microservices-based architecture for controlling an
 
 ### Framework & Technologies
 
-| Component | Technology | Purpose |
-|-----------|------------|---------|
-| **UI Framework** | [NiceGUI](https://nicegui.io/) | Python-based web UI with reactive components |
-| **Messaging** | [MQTT](https://mqtt.org/) (Mosquitto) | Lightweight pub/sub protocol for IoT |
-| **Containerization** | Docker Compose | Service orchestration and isolation |
-| **Charts** | ECharts (via NiceGUI) | Real-time speed visualization |
+| Component            | Technology                            | Purpose                                      |
+| -------------------- | ------------------------------------- | -------------------------------------------- |
+| **UI Framework**     | [NiceGUI](https://nicegui.io/)        | Python-based web UI with reactive components |
+| **Messaging**        | [MQTT](https://mqtt.org/) (Mosquitto) | Lightweight pub/sub protocol for IoT         |
+| **Containerization** | Docker Compose                        | Service orchestration and isolation          |
+| **Charts**           | ECharts (via NiceGUI)                 | Real-time speed visualization                |
 
 ## Project Structure
 
@@ -60,12 +60,12 @@ FlexiBot/
 
 ### File Descriptions
 
-| File | Description |
-|------|-------------|
-| `docker-compose.yml` | Defines the three services (mosquitto, controller, dashboard) and their networking |
-| `services/controller/main.py` | NiceGUI app with dual joystick controls that publish motor speed values (−100 to 100) to MQTT topics |
-| `services/dashboard/main.py` | NiceGUI app that subscribes to MQTT topics and displays live values with 30-second rolling speed charts |
-| `shared/mqtt.yaml` | Shared configuration defining MQTT broker address and topic mappings with friendly names |
+| File                          | Description                                                                                             |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `docker-compose.yml`          | Defines the three services (mosquitto, controller, dashboard) and their networking                      |
+| `services/controller/main.py` | NiceGUI app with dual joystick controls that publish motor speed values (−100 to 100) to MQTT topics    |
+| `services/dashboard/main.py`  | NiceGUI app that subscribes to MQTT topics and displays live values with 30-second rolling speed charts |
+| `shared/mqtt.yaml`            | Shared configuration defining MQTT broker address and topic mappings with friendly names                |
 
 ## Quick Start
 
@@ -94,21 +94,21 @@ docker compose down
 
 Defined in `shared/mqtt.yaml`:
 
-| Topic | Description |
-|-------|-------------|
-| `motor1/armed` | Motor 1 armed status |
+| Topic          | Description                 |
+| -------------- | --------------------------- |
+| `motor1/armed` | Motor 1 armed status        |
 | `motor1/speed` | Motor 1 speed (−100 to 100) |
-| `motor2/armed` | Motor 2 armed status |
+| `motor2/armed` | Motor 2 armed status        |
 | `motor2/speed` | Motor 2 speed (−100 to 100) |
 
 ## Ports
 
-| Service | Port | Description |
-|---------|------|-------------|
-| Mosquitto | 1883 | MQTT broker |
-| Mosquitto | 9001 | WebSocket (optional) |
-| Dashboard | 8080 | Monitoring UI |
-| Controller | 8081 | Control UI |
+| Service    | Port | Description          |
+| ---------- | ---- | -------------------- |
+| Mosquitto  | 1883 | MQTT broker          |
+| Mosquitto  | 9001 | WebSocket (optional) |
+| Dashboard  | 8080 | Monitoring UI        |
+| Controller | 8081 | Control UI           |
 
 ## CI/CD
 
