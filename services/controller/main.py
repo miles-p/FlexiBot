@@ -34,14 +34,29 @@ def connect_mqtt():
 
 connect_mqtt()
 
+# Track LED state
+led_status = {'on': False}
+
 # Publish motor speed
 def publish_speed(motor: int, value: float):
     topic = f"motor{motor}/speed"
     mqtt_client.publish(topic, str(int(value)))
 
+# Toggle LED status
+def toggle_led():
+    led_status['on'] = not led_status['on']
+    status = "1" if led_status['on'] else "0"
+    mqtt_client.publish("led/status", status)
+    led_button.props(f'color={"green" if led_status["on"] else "red"}')
+    led_button.text = f'LED: {status.upper()}'
+
 # Build the NiceGUI interface
 with ui.column().classes('w-full max-w-4xl mx-auto p-4'):
     ui.label('FlexiBot Controller').classes('text-3xl font-bold text-center mb-6')
+    
+    # LED Toggle Button
+    with ui.card().classes('w-full mb-4 p-4'):
+        led_button = ui.button('LED: OFF', on_click=toggle_led).props('color=red').classes('w-full text-lg')
     
     with ui.row().classes('w-full justify-center gap-8'):
         # Motor 1 Joystick

@@ -1,7 +1,7 @@
 services:
-  mosquitto:
+  broker:
     image: eclipse-mosquitto:latest
-    container_name: mosquitto
+    container_name: broker
     ports:
       - "1883:1883"
       - "9001:9001"
@@ -17,10 +17,10 @@ services:
     volumes:
       - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
     environment:
-      - MQTT_BROKER=mosquitto
+      - MQTT_BROKER=broker
       - MQTT_PORT=1883
     depends_on:
-      - mosquitto
+      - broker
     restart: unless-stopped
 
   controller:
@@ -31,10 +31,10 @@ services:
     volumes:
       - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
     environment:
-      - MQTT_BROKER=mosquitto
+      - MQTT_BROKER=broker
       - MQTT_PORT=1883
     depends_on:
-      - mosquitto
+      - broker
     restart: unless-stopped
 
 networks:

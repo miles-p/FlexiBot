@@ -10,7 +10,10 @@ controls:
       name: Motor 2 Armed
     - topic: motor2/speed
       name: Motor 2 Speed
+  led:
+    - topic: led/status
+      name: LED Status
 
 host:
-  address: mosquitto
+  address: broker
   port: 1883
