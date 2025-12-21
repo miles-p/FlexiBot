@@ -43,6 +43,8 @@ services:
     volumes:
       - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
       - ./shared/logs.txt:/app/logs.txt
+    environment:
+      - TZ=Australia/Sydney
 
 networks:
   network:
