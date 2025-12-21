@@ -47,6 +47,3 @@ services:
 networks:
   network:
     driver: bridge
-
-volumes:
-  logs: 
