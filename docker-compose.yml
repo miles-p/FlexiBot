@@ -37,6 +37,10 @@ services:
       - broker
     restart: unless-stopped
 
+  logger:
+    build: ./services/logger
+    container_name: logger
+
 networks:
   network:
     driver: bridge
