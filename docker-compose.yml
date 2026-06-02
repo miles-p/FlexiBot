@@ -42,9 +42,18 @@ services:
     container_name: logger
     volumes:
       - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
-      - ./shared/logs.txt:/app/logs.txt
+      - ./shared/logs:/app/logs
     environment:
       - TZ=Australia/Sydney
+
+  platform:
+    build: ./services/platform
+    container_name: platform
+    volumes:
+      - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
+    depends_on:
+      - broker
+    restart: unless-stopped
 
 networks:
   network:

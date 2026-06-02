@@ -1,17 +1,9 @@
+import os
 import paho.mqtt.client as mqtt
 import yaml
-import os 
-from datetime import datetime
 
-# Path to config and logs
-CONFIG_PATH = os.path.join("app", "mqtt.yaml")
-LOG_DIR = os.path.join("app", "logs")
-LOG_PATH = os.path.join(LOG_DIR, "logs.txt")
 
-def load_config():
-    """Load MQTT configuration from yaml file"""
-    with open(CONFIG_PATH, 'r') as f:
-        return yaml.safe_load(f)
+CONFIG_PATH =  os.path.join("app", "mqtt.yaml")
 
 def get_all_topics(config):
     """Extract all topics from the config"""
@@ -21,18 +13,11 @@ def get_all_topics(config):
             topics.append(control['topic'])
     return topics
 
-def log_message(topic, payload):
-    """Log message to file with timestamp"""
-    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
-    log_entry = f"[{timestamp}] {topic}: {payload}\n"
-
-    os.makedirs(LOG_DIR, exist_ok=True)
+def load_config():
+    """Load MQTT configuration from yaml file"""
+    with open(CONFIG_PATH, 'r') as f:
+        return yaml.safe_load(f)
     
-    with open(LOG_PATH, 'a') as f:
-        f.write(log_entry)
-    
-    print(log_entry.strip())
-
 def on_connect(client, userdata, flags, rc):
     """Callback when client connects to broker"""
     if rc == 0:
@@ -48,19 +33,14 @@ def on_message(client, userdata, msg):
     """Callback when message is received"""
     topic = msg.topic
     payload = msg.payload.decode('utf-8')
-    log_message(topic, payload)
+
+    #TODO: send to hardware platform!
+    print(f"Received message on {topic}: {payload}")
 
 def main():
-    # Load configuration
     config = load_config()
     topics = get_all_topics(config)
-    
-    print(f"Loaded {len(topics)} topics from config")
-    
-    # Create MQTT client
     client = mqtt.Client(userdata={'topics': topics})
-    client.on_connect = on_connect
-    client.on_message = on_message
     
     # Connect to broker
     host = config['host']['address']
@@ -74,4 +54,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
