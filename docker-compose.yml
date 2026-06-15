@@ -51,6 +51,8 @@ services:
     container_name: platform
     volumes:
       - ./shared/mqtt.yaml:/app/mqtt.yaml:ro
+    devices:
+      - /dev/ttyACM0:/dev/ttyACM0
     depends_on:
       - broker
     restart: unless-stopped
